@@ -6,6 +6,8 @@ type Props = {};
 
 const Dashboard = (props: Props) => {
     const {data} = useGetKpisQuery();
+    console.log(data);
+    
   const gridTemplateLargeScreens = `
     "a b c"
     "a b c"
