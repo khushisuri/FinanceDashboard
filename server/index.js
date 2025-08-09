@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 // import KPI from "./models/KPI.js";
-// import { kpis } from "./data/data.js";
+//import { kpis } from "./data/data.js";
 import kpiRoutes from "./routes/kpiRoutes.js";
 
 dotenv.config();
