@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import DashboardBox from "../components/DashboardBox";
 import { useGetKpisQuery } from "../state/api";
 import {
@@ -15,9 +15,16 @@ import {
   Bar,
   Rectangle,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  ScatterChart,
+  Scatter,
+  ZAxis,
 } from "recharts";
 import { useMemo } from "react";
 import BoxHeader from "../components/BoxHeader";
+import FlexBetween from "../components/FlexBetween";
 
 const Dashboard = () => {
   const { data } = useGetKpisQuery();
@@ -49,6 +56,16 @@ const Dashboard = () => {
         month: it.month.substring(0, 3),
         revenue: it.revenue,
         profit: (it.revenue - it.expenses).toFixed(2),
+      })),
+    [data]
+  );
+  const operationalNonOperational = useMemo(
+    () =>
+      data &&
+      data[0].monthlyData.map((it) => ({
+        month: it.month.substring(0, 3),
+        operationalExpenses: it.operationalExpenses,
+        nonOperationalExpenses: it.nonOperationalExpenses,
       })),
     [data]
   );
@@ -99,6 +116,12 @@ const Dashboard = () => {
     "j"
     `;
   const isSmallScreens = useMediaQuery("(min-width:1200px)");
+  const pieData = [
+    { name: "Group A", value: 600 },
+    { name: "Group B", value: 400 },
+  ];
+
+  const pieColors = [palette.primary[800], palette.primary[300]];
   return (
     <Box
       height={"100%"}
@@ -109,7 +132,7 @@ const Dashboard = () => {
           ? {
               gridTemplateAreas: gridTemplateLargeScreens,
               gridTemplateColumns: "repeat(3,minmax(370px,1fr))",
-              gridTemplateRows: "repeat(10,.minmax(60px,1fr))",
+              gridTemplateRows: "repeat(10,.minmax(80px,1fr))",
             }
           : {
               gridTemplateAreas: gridTemplateSmallScreens,
@@ -275,7 +298,7 @@ const Dashboard = () => {
               style={{ fontSize: "10px" }}
               axisLine={{ strokeWidth: "0" }}
             />
-             <defs>
+            <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
@@ -290,16 +313,111 @@ const Dashboard = () => {
               </linearGradient>
             </defs>
             <Tooltip />
-            <Bar
-              dataKey="revenue"
-              fill="url(#colorRevenue)"
-            />
+            <Bar dataKey="revenue" fill="url(#colorRevenue)" />
           </BarChart>
           <CartesianGrid vertical={false} stroke={palette.grey[800]} />
         </ResponsiveContainer>
       </DashboardBox>
-      <DashboardBox gridArea={"d"}></DashboardBox>
-      <DashboardBox gridArea={"e"}></DashboardBox>
+      <DashboardBox gridArea={"d"}>
+        <BoxHeader
+          title="Operational vs Non-Operational Expenses"
+          sidetext="4%"
+        />
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            width={500}
+            height={400}
+            data={operationalNonOperational}
+            margin={{
+              top: 20,
+              right: 0,
+              left: -10,
+              bottom: 55,
+            }}
+          >
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              style={{ fontSize: "10px" }}
+            />
+            <YAxis
+              yAxisId="left"
+              tickLine={false}
+              style={{ fontSize: "10px" }}
+              axisLine={{ strokeWidth: "0" }}
+            />
+            <YAxis
+              yAxisId="right"
+              tickLine={false}
+              style={{ fontSize: "10px" }}
+              orientation="right"
+              axisLine={{ strokeWidth: "0" }}
+            />
+            <Tooltip />
+            <Line
+              yAxisId="left"
+              type="monotone"
+              dataKey="operationalExpenses"
+              stroke={palette.tertiary[500]}
+              dot={true}
+            />
+            <Line
+              yAxisId="right"
+              type="monotone"
+              dataKey="nonOperationalExpenses"
+              stroke={palette.primary.main}
+              dot={true}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </DashboardBox>
+      <DashboardBox gridArea={"e"}>
+        <BoxHeader title="Campaigns and Targets" sidetext="4%"/>
+        <FlexBetween mt="0.25rem" gap="1.5rem" pr="1rem">
+          <PieChart
+            width={110}
+            height={100}
+            margin={{
+              top: 0,
+              right: -10,
+              left: 10,
+              bottom: 0,
+            }}
+          >
+            <Pie
+              stroke="none"
+              data={pieData}
+              innerRadius={18}
+              outerRadius={38}
+              paddingAngle={2}
+              dataKey="value"
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={pieColors[index]} />
+              ))}
+            </Pie>
+          </PieChart>
+          <Box ml="-0.7rem" flexBasis="40%" textAlign="center">
+            <Typography variant="h5">Target Sales</Typography>
+            <Typography m="0.3rem 0" variant="h3" color={palette.primary[300]}>
+              83
+            </Typography>
+            <Typography variant="h6">
+              Finance goals of the campaign that is desired
+            </Typography>
+          </Box>
+          <Box flexBasis="40%">
+            <Typography variant="h5">Losses in Revenue</Typography>
+            <Typography variant="h6">Losses are down 25%</Typography>
+            <Typography mt="0.4rem" variant="h5">
+              Profit Margins
+            </Typography>
+            <Typography variant="h6">
+              Margins are up by 30% from last month.
+            </Typography>
+          </Box>
+        </FlexBetween>
+      </DashboardBox>
       <DashboardBox gridArea={"f"}></DashboardBox>
       <DashboardBox gridArea={"g"}></DashboardBox>
       <DashboardBox gridArea={"h"}></DashboardBox>

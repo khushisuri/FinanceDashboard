@@ -4,10 +4,10 @@ import { Box, Typography, useTheme } from "@mui/material";
 
 type Props = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   icon?: React.ReactNode;
   sidetext: string;
-};
+}
 
 const BoxHeader = ({ title, subtitle, icon, sidetext }: Props) => {
   const { palette } = useTheme();
