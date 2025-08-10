@@ -1,6 +1,6 @@
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import DashboardBox from "../components/DashboardBox";
-import { useGetKpisQuery } from "../state/api";
+import { useGetKpisQuery, useGetProductsQuery } from "../state/api";
 import {
   AreaChart,
   Area,
@@ -28,6 +28,19 @@ import FlexBetween from "../components/FlexBetween";
 
 const Dashboard = () => {
   const { data } = useGetKpisQuery();
+
+  const { data: productsData } = useGetProductsQuery();
+
+  const priceExpense = useMemo(
+    () =>
+      productsData &&
+      productsData.map((it) => ({
+        id: it._id,
+        price: it.price,
+        expense: it.expense,
+      })),
+    [productsData]
+  );
   const { palette } = useTheme();
   const revenue = useMemo(
     () =>
@@ -157,7 +170,7 @@ const Dashboard = () => {
               top: 15,
               right: 25,
               left: -10,
-              bottom: 60,
+              bottom: 10
             }}
           >
             <defs>
@@ -230,7 +243,7 @@ const Dashboard = () => {
               top: 20,
               right: 0,
               left: -10,
-              bottom: 55,
+              bottom: 10
             }}
           >
             <XAxis
@@ -332,7 +345,7 @@ const Dashboard = () => {
               top: 20,
               right: 0,
               left: -10,
-              bottom: 55,
+              bottom: 10
             }}
           >
             <XAxis
@@ -372,7 +385,7 @@ const Dashboard = () => {
         </ResponsiveContainer>
       </DashboardBox>
       <DashboardBox gridArea={"e"}>
-        <BoxHeader title="Campaigns and Targets" sidetext="4%"/>
+        <BoxHeader title="Campaigns and Targets" sidetext="4%" />
         <FlexBetween mt="0.25rem" gap="1.5rem" pr="1rem">
           <PieChart
             width={110}
@@ -418,7 +431,43 @@ const Dashboard = () => {
           </Box>
         </FlexBetween>
       </DashboardBox>
-      <DashboardBox gridArea={"f"}></DashboardBox>
+      <DashboardBox gridArea={"f"}>
+        <BoxHeader title="Product Prices vs Expenses" sideText="+4%" />
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart
+            margin={{
+              top: 0,
+              right: 20,
+              bottom: 20,
+              left: -20,
+            }}
+          >
+            <CartesianGrid stroke={palette.grey[800]} />
+            <XAxis
+              type="number"
+              dataKey="price"
+              axisLine={false}
+              tickLine={false}
+              style={{ fontSize: "10px" }}
+              tickFormatter={(v) => `$${v}`}
+            />
+            <YAxis
+              type="number"
+              dataKey="expense"
+              axisLine={false}
+              tickLine={false}
+              style={{ fontSize: "10px" }}
+              tickFormatter={(v) => `$${v}`}
+            />
+            <Tooltip formatter={(v) => `$${v}`} />
+            <Scatter
+              name="Product Expense Ratio"
+              data={productsData}
+              fill={palette.tertiary[500]}
+            />
+          </ScatterChart>
+        </ResponsiveContainer>
+      </DashboardBox>
       <DashboardBox gridArea={"g"}></DashboardBox>
       <DashboardBox gridArea={"h"}></DashboardBox>
       <DashboardBox gridArea={"i"}></DashboardBox>
