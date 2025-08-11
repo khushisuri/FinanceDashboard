@@ -164,7 +164,7 @@ const Dashboard = () => {
     "h"
     "i"
     "i"
-    "j"
+    "i"
     "j"
     `;
   const isSmallScreens = useMediaQuery("(min-width:1200px)");
