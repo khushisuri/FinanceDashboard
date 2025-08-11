@@ -88,7 +88,6 @@ const Dashboard = () => {
     [data]
   );
 
-  console.log(transactionsData);
 
   const buyerAmount = useMemo(
     () =>
@@ -120,7 +119,6 @@ const Dashboard = () => {
       })
     );
   }, [data]);
-  console.log(pieChartData);
 
   const gridTemplateLargeScreens = `
     "a b c"
@@ -164,7 +162,7 @@ const Dashboard = () => {
     "h"
     "i"
     "i"
-    "i"
+    "j"
     "j"
     `;
   const isSmallScreens = useMediaQuery("(min-width:1200px)");
@@ -218,17 +216,19 @@ const Dashboard = () => {
       height={"100%"}
       width={"100%"}
       display={"grid"}
+      justifyContent={"center"}
       sx={
         isSmallScreens
           ? {
               gridTemplateAreas: gridTemplateLargeScreens,
               gridTemplateColumns: "repeat(3,minmax(370px,1fr))",
-              gridTemplateRows: "repeat(10,.minmax(80px,1fr))",
+              gridTemplateRows: "repeat(10,minmax(80px,1fr))",
             }
           : {
               gridTemplateAreas: gridTemplateSmallScreens,
               gridAutoColumns: "1fr",
               gridAutoRows: "80px",
+              overflowX: "clip",  
             }
       }
       gap={"1.2rem"}
@@ -646,9 +646,9 @@ const Dashboard = () => {
           />
         </Box>
       </DashboardBox>
-      <DashboardBox gridArea={"i"}>
+      <DashboardBox gridArea={"i"} gap="0rem !important">
         <BoxHeader title="Expense Breakdown By Category" sidetext="+4%" />
-        <FlexBetween mt="0.5rem" gap="0.5rem" p="0 1rem" textAlign="center">
+        <FlexBetween mt="0.5rem" textAlign="center">
           {pieChartData &&
             pieChartData.map(
               (pie, i) =>
@@ -686,13 +686,13 @@ const Dashboard = () => {
             width="100%"
             borderRadius="1rem"
             backgroundColor={palette.primary.dark}
-            height="2rem"
+            height="1rem"
           >
             <Box
               width="40%"
               borderRadius="1rem"
               backgroundColor={palette.primary.light}
-              height="2rem"
+              height="1rem"
             ></Box>
           </Box>
           <Typography my="1rem" color={palette.primary[100]}>

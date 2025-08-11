@@ -25,7 +25,7 @@ const Navbar = (props: Props) => {
             sx={{
               textDecoration: "none",
               "& a": {
-                color: selected === "dashboard" ? "inherit" : palette.grey[700],
+                color: selected === "dashboard" ? palette.primary[100]: palette.grey[700],
               },
             }}
           >
@@ -40,7 +40,7 @@ const Navbar = (props: Props) => {
             component={RouterLink}
             to="/predictions"
             sx={{
-              color: selected === "predictions" ? "inherit" : palette.grey[700],
+              color: selected === "predictions" ? palette.primary[100] : palette.grey[700],
               textDecoration: "none",
             }}
           >
