@@ -647,7 +647,7 @@ const Dashboard = () => {
         </Box>
       </DashboardBox>
       <DashboardBox gridArea={"i"}>
-        <BoxHeader title="Expense Breakdown By Category" sidetext="+4%"/>
+        <BoxHeader title="Expense Breakdown By Category" sidetext="+4%" />
         <FlexBetween mt="0.5rem" gap="0.5rem" p="0 1rem" textAlign="center">
           {pieChartData &&
             pieChartData.map(
@@ -679,7 +679,28 @@ const Dashboard = () => {
             )}
         </FlexBetween>
       </DashboardBox>
-      <DashboardBox gridArea={"j"}></DashboardBox>
+      <DashboardBox gridArea={"j"}>
+        <BoxHeader title="Expense Breakdown By Category" sidetext="+4%" />
+        <Box>
+          <Box
+            width="100%"
+            borderRadius="1rem"
+            backgroundColor={palette.primary.dark}
+            height="2rem"
+          >
+            <Box
+              width="40%"
+              borderRadius="1rem"
+              backgroundColor={palette.primary.light}
+              height="2rem"
+            ></Box>
+          </Box>
+          <Typography my="1rem" color={palette.primary[100]}>
+            An overview of key segments, showing how each category contributes
+            to the total for informed decision-making.
+          </Typography>
+        </Box>
+      </DashboardBox>
     </Box>
   );
 };
