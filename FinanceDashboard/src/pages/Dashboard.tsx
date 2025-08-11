@@ -1,6 +1,10 @@
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import DashboardBox from "../components/DashboardBox";
-import { useGetKpisQuery, useGetProductsQuery } from "../state/api";
+import {
+  useGetKpisQuery,
+  useGetProductsQuery,
+  useGetTransactionsQuery,
+} from "../state/api";
 import {
   AreaChart,
   Area,
@@ -13,23 +17,24 @@ import {
   LineChart,
   BarChart,
   Bar,
-  Rectangle,
   CartesianGrid,
   PieChart,
   Pie,
   Cell,
   ScatterChart,
   Scatter,
-  ZAxis,
 } from "recharts";
 import { useMemo } from "react";
 import BoxHeader from "../components/BoxHeader";
 import FlexBetween from "../components/FlexBetween";
+import { DataGrid, type GridCellParams } from "@mui/x-data-grid";
 
 const Dashboard = () => {
   const { data } = useGetKpisQuery();
 
   const { data: productsData } = useGetProductsQuery();
+
+  const { data: transactionsData } = useGetTransactionsQuery();
 
   const priceExpense = useMemo(
     () =>
@@ -83,6 +88,19 @@ const Dashboard = () => {
     [data]
   );
 
+  console.log(transactionsData);
+  
+  const buyerAmount = useMemo(
+    () =>
+      transactionsData &&
+      transactionsData.map((it) => ({
+        id: it._id,
+        buyer: it.buyer,
+        amount: it.amount,
+        productIds: it.productIds,
+      })),
+    [transactionsData]
+  );
   const gridTemplateLargeScreens = `
     "a b c"
     "a b c"
@@ -135,6 +153,45 @@ const Dashboard = () => {
   ];
 
   const pieColors = [palette.primary[800], palette.primary[300]];
+
+  const productColumns = [
+    { field: "id", headerName: "ID", flex: 1 },
+    {
+      field: "expense",
+      headerName: "Expense",
+      flex: 0.5,
+      renderCell: (params: GridCellParams) => `$${params.value}`,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      flex: 0.5,
+      renderCell: (params: GridCellParams) => `$${params.value}`,
+    },
+  ];
+
+  const transactionColumns = [
+    { field: "id", headerName: "ID", flex: 1 },
+    {
+      field: "buyer",
+      headerName: "Buyer",
+      flex: 0.5,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      flex: 0.5,
+      renderCell: (params: GridCellParams) => `$${params.value}`,
+    },
+    {
+      field: "productIds",
+      headerName: "Count",
+      flex: 0.1,
+      renderCell: (params: GridCellParams) =>
+        (params.value as Array<string>).length,
+    },
+  ];
+
   return (
     <Box
       height={"100%"}
@@ -155,7 +212,7 @@ const Dashboard = () => {
       }
       gap={"1.2rem"}
     >
-      <DashboardBox gridArea={"a"}>
+      <DashboardBox gridArea={"a"} minHeight={"250px"}>
         <BoxHeader
           title="Revenue and Expenses"
           subtitle="top line represents revenue, bottom line represents expenses"
@@ -170,7 +227,7 @@ const Dashboard = () => {
               top: 15,
               right: 25,
               left: -10,
-              bottom: 10
+              bottom: 10,
             }}
           >
             <defs>
@@ -243,7 +300,7 @@ const Dashboard = () => {
               top: 20,
               right: 0,
               left: -10,
-              bottom: 10
+              bottom: 10,
             }}
           >
             <XAxis
@@ -345,7 +402,7 @@ const Dashboard = () => {
               top: 20,
               right: 0,
               left: -10,
-              bottom: 10
+              bottom: 10,
             }}
           >
             <XAxis
@@ -384,7 +441,7 @@ const Dashboard = () => {
           </LineChart>
         </ResponsiveContainer>
       </DashboardBox>
-      <DashboardBox gridArea={"e"}>
+      <DashboardBox gridArea={"e"} pb={"2rem"}>
         <BoxHeader title="Campaigns and Targets" sidetext="4%" />
         <FlexBetween mt="0.25rem" gap="1.5rem" pr="1rem">
           <PieChart
@@ -462,14 +519,112 @@ const Dashboard = () => {
             <Tooltip formatter={(v) => `$${v}`} />
             <Scatter
               name="Product Expense Ratio"
-              data={productsData}
+              data={priceExpense}
               fill={palette.tertiary[500]}
             />
           </ScatterChart>
         </ResponsiveContainer>
       </DashboardBox>
-      <DashboardBox gridArea={"g"}></DashboardBox>
-      <DashboardBox gridArea={"h"}></DashboardBox>
+      <DashboardBox gridArea={"g"}>
+        <BoxHeader
+          title="List of Products"
+          sidetext={`${priceExpense?.length} products`}
+        />
+        <Box
+          mt="0.5rem"
+          p="0 0.5rem"
+          height="75%"
+          sx={{
+            "& .MuiDataGrid-root": {
+              color: palette.grey[300],
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: `1px solid ${palette.grey[800]} !important`,
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              borderBottom: `1px solid ${palette.grey[800]} !important`,
+            },
+            "& .MuiDataGrid-columnSeparator": {
+              visibility: "hidden",
+            },
+            "& .MuiButtonBase-root": {
+              color: "white",
+            },
+            "&. Mui-checked": {
+              color: palette.primary[500],
+            },
+            "&. MuiTablePagination-toolbar": {
+              color: "white",
+            },
+          }}
+        >
+          <DataGrid
+            rows={priceExpense}
+            columns={productColumns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
+            }}
+            pageSizeOptions={[5]}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
+        </Box>
+      </DashboardBox>
+      <DashboardBox gridArea={"h"}>
+        <BoxHeader
+          title="Recent Orders"
+          sidetext={`${transactionsData?.length} latest transactions`}
+        />
+        <Box
+          mt="0.5rem"
+          p="0 0.5rem"
+          height="75%"
+          sx={{
+            "& .MuiDataGrid-root": {
+              color: palette.grey[300],
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: `1px solid ${palette.grey[800]} !important`,
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              borderBottom: `1px solid ${palette.grey[800]} !important`,
+            },
+            "& .MuiDataGrid-columnSeparator": {
+              visibility: "hidden",
+            },
+            "& .MuiButtonBase-root": {
+              color: "white",
+            },
+            "&. Mui-checked": {
+              color: palette.primary[500],
+            },
+            "&. MuiTablePagination-toolbar": {
+              color: "white",
+            },
+          }}
+        >
+          <DataGrid
+            rows={buyerAmount}
+            columns={transactionColumns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
+            }}
+            pageSizeOptions={[5]}
+            checkboxSelection
+            disableRowSelectionOnClick
+          />
+        </Box>
+      </DashboardBox>
       <DashboardBox gridArea={"i"}></DashboardBox>
       <DashboardBox gridArea={"j"}></DashboardBox>
     </Box>
