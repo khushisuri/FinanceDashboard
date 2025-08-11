@@ -89,7 +89,7 @@ const Dashboard = () => {
   );
 
   console.log(transactionsData);
-  
+
   const buyerAmount = useMemo(
     () =>
       transactionsData &&
@@ -101,6 +101,27 @@ const Dashboard = () => {
       })),
     [transactionsData]
   );
+
+  const pieChartData = useMemo(() => {
+    const totalExpenses = data && data[0].totalExpenses;
+    return (
+      data &&
+      totalExpenses &&
+      Object.entries(data[0].expensesByCategory).map(([key, value]) => {
+        if (value !== null) {
+          return [
+            { name: key, value: value },
+            {
+              name: `${key} of Total`,
+              value: totalExpenses - value,
+            },
+          ];
+        }
+      })
+    );
+  }, [data]);
+  console.log(pieChartData);
+
   const gridTemplateLargeScreens = `
     "a b c"
     "a b c"
@@ -625,7 +646,39 @@ const Dashboard = () => {
           />
         </Box>
       </DashboardBox>
-      <DashboardBox gridArea={"i"}></DashboardBox>
+      <DashboardBox gridArea={"i"}>
+        <BoxHeader title="Expense Breakdown By Category" sidetext="+4%"/>
+        <FlexBetween mt="0.5rem" gap="0.5rem" p="0 1rem" textAlign="center">
+          {pieChartData &&
+            pieChartData.map(
+              (pie, i) =>
+                pie && (
+                  <Box>
+                    <PieChart
+                      width={110}
+                      height={100}
+                      key={`${pie[0].name}-${i}`}
+                    >
+                      <Pie
+                        data={pie}
+                        innerRadius={18}
+                        outerRadius={35}
+                        paddingAngle={2}
+                        fill="#8884d8"
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {pie.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={pieColors[index]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                    <Typography variant="h5">{pie[0].name}</Typography>
+                  </Box>
+                )
+            )}
+        </FlexBetween>
+      </DashboardBox>
       <DashboardBox gridArea={"j"}></DashboardBox>
     </Box>
   );
