@@ -24,25 +24,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-function requireDb(_req, res, next) {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(202).json({ message: "loading" });
-  }
-  next();
-}
-console.log(mongoose.connection.readyState, "state");
 
-app.use("/kpi", requireDb, kpiRoutes);
-app.use("/product", requireDb, productRoutes);
-app.use("/transaction", requireDb, transactionRoutes);
+app.use("/kpi", kpiRoutes);
+app.use("/product", productRoutes);
+app.use("/transaction", transactionRoutes);
 
 const PORT = process.env.PORT || 8080;
 const HOST = "0.0.0.0";
-
-app.listen(PORT, HOST, () => {
-  console.log(`listening on ${HOST}:${PORT}`);
-  console.log(mongoose.connection.readyState, "state");
-});
 
 const uri = process.env.MONGO_URL;
 if (!uri) {
@@ -55,6 +43,10 @@ if (!uri) {
     })
     .then(async () => {
       console.log("Mongo connected");
+      app.listen(PORT, HOST, () => {
+        console.log(`listening on ${HOST}:${PORT}`);
+        console.log(mongoose.connection.readyState, "state");
+      });
     })
     .catch((err) => console.error("Mongo connect failed:", err));
 }
