@@ -24,22 +24,37 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-app.use("/kpi", kpiRoutes);
-app.use("/product", productRoutes);
-app.use("/transaction", transactionRoutes);
+function requireDb(_req, res, next) {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(202).json({ message: "loading" });
+  }
+  next();
+}
+console.log(mongoose.connection.readyState, "state");
+
+app.use("/kpi", requireDb, kpiRoutes);
+app.use("/product", requireDb, productRoutes);
+app.use("/transaction", requireDb, transactionRoutes);
 
 const PORT = process.env.PORT || 8080;
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(async () => {
-    app.listen(PORT, "0.0.0.0", () => console.log(`running on port ${PORT}`));
-    /* ADD DATA ONE TIME ONLY OR AS NEEDED */
-    //await mongoose.connection.db.dropDatabase();
-    //KPI.insertMany(kpis);
-    //Product.insertMany(products);
-    //Transaction.insertMany(transactions);
-  })
-  .catch(({ error }) => console.log(error));
+const HOST = "0.0.0.0";
+
+app.listen(PORT, HOST, () => {
+  console.log(`listening on ${HOST}:${PORT}`);
+  console.log(mongoose.connection.readyState, "state");
+});
+
+const uri = process.env.MONGO_URL;
+if (!uri) {
+  console.warn("MONGO_URL not set — starting without DB");
+} else {
+  mongoose
+    .connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 10000,
+    })
+    .then(async () => {
+      console.log("Mongo connected");
+    })
+    .catch((err) => console.error("Mongo connect failed:", err));
+}
