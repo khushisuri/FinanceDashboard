@@ -28,14 +28,14 @@ app.use("/kpi", kpiRoutes);
 app.use("/product", productRoutes);
 app.use("/transaction", transactionRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(async () => {
-    app.listen(PORT, () => console.log(`running on port ${PORT}`));
+    app.listen(PORT, "0.0.0.0", () => console.log(`running on port ${PORT}`));
     /* ADD DATA ONE TIME ONLY OR AS NEEDED */
     //await mongoose.connection.db.dropDatabase();
     //KPI.insertMany(kpis);
