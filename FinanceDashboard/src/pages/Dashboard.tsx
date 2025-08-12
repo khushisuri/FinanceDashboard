@@ -443,6 +443,7 @@ const Dashboard = () => {
                   bottom: 5,
                 }}
               >
+                <CartesianGrid vertical={false} stroke={palette.grey[800]} />
                 <XAxis
                   dataKey="month"
                   tickLine={false}
@@ -470,7 +471,6 @@ const Dashboard = () => {
                 <Tooltip />
                 <Bar dataKey="revenue" fill="url(#colorRevenue)" />
               </BarChart>
-              <CartesianGrid vertical={false} stroke={palette.grey[800]} />
             </ResponsiveContainer>
           </DashboardBox>
           <DashboardBox gridArea={"d"}>
@@ -578,7 +578,10 @@ const Dashboard = () => {
             </FlexBetween>
           </DashboardBox>
           <DashboardBox gridArea={"f"}>
-            <BoxHeader title="Product Prices vs Expenses" sideText="+4%" />
+            <BoxHeader
+              title="Product Prices vs Expenses"
+              sidetext="4%"
+            ></BoxHeader>
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart
                 margin={{
@@ -754,16 +757,20 @@ const Dashboard = () => {
             <BoxHeader title="Expense Breakdown By Category" sidetext="+4%" />
             <Box>
               <Box
-                width="100%"
-                borderRadius="1rem"
-                backgroundColor={palette.primary.dark}
-                height="1rem"
+                sx={{
+                  width: "100%",
+                  borderRadius: "1rem",
+                  bgcolor: "primary.dark",
+                  height: "1rem",
+                }}
               >
                 <Box
-                  width="40%"
-                  borderRadius="1rem"
-                  backgroundColor={palette.primary.light}
-                  height="1rem"
+                  sx={{
+                    width: "40%",
+                    borderRadius: "1rem",
+                    bgcolor: "primary.light",
+                    height: "1rem",
+                  }}
                 ></Box>
               </Box>
               <Typography my="1rem" color={palette.primary[100]}>

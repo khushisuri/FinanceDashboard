@@ -1,8 +1,8 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
+import App from "./App";
 import { configureStore } from "@reduxjs/toolkit";
-import { api } from "./state/api.ts";
+import { api } from "./state/api";
 import { Provider } from "react-redux";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
